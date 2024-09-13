@@ -1,0 +1,152 @@
+@font-face {
+    font-family: 'BatonTurbo';
+    src: url('./fonts/BatonTurboWeb-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'BatonTurbo';
+    src: url('./fonts/BatonTurboWeb-Medium.woff') format('woff');
+    font-style: bold;
+  }
+
+  body {
+    margin: 0;
+  }
+  
+  .sticky-inner img {
+    width: 100%;
+    object-fit: cover;
+    height: 100vh;
+  }
+  
+  #scrolly {
+    position: relative;
+  }
+  
+  .scrolly-overlay {
+    position: relative;
+    padding: 0rem 1rem;
+    max-width: 35rem;
+    margin: 0 auto;
+    z-index: 2;
+  }
+  
+  .sticky-thing {
+    position: sticky;
+    left: 0;
+    width: 100%;
+    margin: 0;
+    z-index: 1;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .step {
+    height: 90vh;
+  }
+  
+  .step p {
+    text-align: left;
+    padding: 1.3rem;
+    font-size: 1rem;
+    font-family: 'BatonTurbo', sans-serif;
+    font-weight: normal;
+    color: white;
+    background-color: #07184D;
+    border-radius: 1px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .step p span {
+    background-color: blueviolet;
+    font-family: 'BatonTurbo', sans-serif;
+    font-weight: bold;
+    padding: 2px 5px;
+    display: inline-block;
+    margin-top: 4px;
+  }
+  
+  .hidden { visibility: hidden; }
+  
+  iframe,
+  img,
+  video {
+    max-width: 100%;
+  }
+  
+  a {
+    text-decoration: underline;
+    font-weight: 700;
+    color: black;
+  }
+  
+  /* figma2html styles */
+  .figma2html {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .f2h-frame {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .f2h-img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  @media (max-width: 640px) {
+    body {
+      font-size: 18px;
+    }
+    h1 {
+      font-size: 40px;
+    }
+    .sticky-inner {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+    }
+    .sticky-inner img {
+      max-width: none;
+      object-fit: cover;
+      height: 90%;
+    }
+    .step p {
+      font-size: 18px;
+    }
+  }
+  
+  @media only screen and (min-width: 700px) {
+    #scrolly.side-by-side {
+      display: flex;
+    }
+  
+    #scrolly.side-by-side > div {
+      flex-basis: 0;
+      flex-grow: 1;
+      flex-shrink: 1;
+      padding: 0.75em;
+    }
+  
+    #scrolly.side-by-side .scrolly-overlay {
+      margin-top: 70vh;
+      order: 0;
+      min-width: 15rem;
+      max-width: 20rem;
+    }
+  
+    #scrolly.side-by-side .sticky-thing {
+      order: 1;
+      flex-grow: 2;
+    }
+  }
