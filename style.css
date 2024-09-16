@@ -59,6 +59,7 @@
     font-weight: normal;
     color: white;
     background-color: #07184D;
+    line-height: 165%;
     border-radius: 1px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
@@ -67,9 +68,8 @@
     background-color: blueviolet;
     font-family: 'BatonTurbo', sans-serif;
     font-weight: bold;
-    padding: 2px 5px;
+    padding: 1px 4px;
     display: inline-block;
-    margin-top: 4px;
   }
   
   .hidden { visibility: hidden; }
@@ -119,7 +119,7 @@
     .sticky-inner img {
       max-width: none;
       object-fit: cover;
-      height: 90%;
+      height: 100%;
     }
     .step p {
       font-size: 18px;
