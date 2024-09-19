@@ -14,15 +14,15 @@
                 <div id="infographics-box" class="figma2html">
                     <div id="f2h-frame-300" class="f2h-frame frame artboard" aspect-ratio="0.566" max-width="554">
                         <div class="spacer" style="padding: 0 0 0 0; min-width: 300px; max-width: 554px;"></div>
-                        <img id="img-f2h-frame-300" class="f2h-img" src="./assets/300px.png" loading="lazy" draggable="false" decoding="async" width="300.00" height="null" alt="Image 1 - Mobile">
+                        <object data="./assets/300px.svg" type="image/svg+xml" class="f2h-img" id="img-f2h-frame-300"></object>
                     </div>
                     <div id="f2h-frame-555" class="f2h-frame frame artboard" aspect-ratio="0.75" min-width="555" max-width="1279">
                         <div class="spacer" style="padding: 0 0 0 0; min-width: 555px; max-width: 1279px;"></div>
-                        <img id="img-f2h-frame-555" class="f2h-img" src="./assets/555px.png" loading="lazy" draggable="false" decoding="async" width="555.00" height="null" alt="Image 1 - Tablet">
+                        <object data="./assets/555px.svg" type="image/svg+xml" class="f2h-img" id="img-f2h-frame-555"></object>
                     </div>
                     <div id="f2h-frame-1280" class="f2h-frame frame artboard" aspect-ratio="1.414" min-width="1280">
                         <div class="spacer" style="padding: 0 0 0 0; min-width: 1280px; max-width: none;"></div>
-                        <img id="img-f2h-frame-1280" class="f2h-img" src="./assets/1280px.png" loading="lazy" draggable="false" decoding="async" width="1280.00" height="null" alt="Image 1 - Desktop">
+                        <object data="./assets/1280px.svg" type="image/svg+xml" class="f2h-img" id="img-f2h-frame-1280"></object>
                     </div>
                 </div>
             </div>
@@ -41,79 +41,94 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/scrollama/3.0.4/scrollama.min.js"></script>
-<script>
-    // Preload images
-    const imageNames = ['300px', '300px_1', '300px_2', '555px', '555px_1', '555px_2', '1280px', '1280px_1', '1280px_2'];
-    imageNames.forEach(name => {
-        const img = new Image();
-        img.src = `./assets/${name}.png`;
-    });
-
-    function updateImages(mobile, tablet, desktop) {
-        console.log(`Updating images: ${mobile}, ${tablet}, ${desktop}`);
-        d3.select("#img-f2h-frame-300").attr("src", `./assets/${mobile}.png`);
-        d3.select("#img-f2h-frame-555").attr("src", `./assets/${tablet}.png`);
-        d3.select("#img-f2h-frame-1280").attr("src", `./assets/${desktop}.png`);
-        figma2htmlResize();
-    }
-
-    // Scrollama initialization
-    const scrollerImg = scrollama();
-
-    scrollerImg
-        .setup({
-            step: ".step",
-            offset: 0.9,
-            debug: false
-        })
-        .onStepEnter(function ({ element, index, direction }) {
-            console.log(`Step ${index + 1} entered, direction: ${direction}`);
-            switch(index) {
-                case 0:
-                    updateImages("300px", "555px", "1280px");
-                    break;
-                case 1:
-                    updateImages("300px_1", "555px_1", "1280px_1");
-                    break;
-                case 2:
-                    updateImages("300px_2", "555px_2", "1280px_2");
-                    break;
+    <script>
+        // Preload SVGs
+        const imageNames = ['300px', '300px_1', '300px_2', '555px', '555px_1', '555px_2', '1280px', '1280px_1', '1280px_2'];
+        imageNames.forEach(name => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', `./assets/${name}.svg`, true);
+            xhr.send();
+        });
+    
+        function updateImages(mobile, tablet, desktop) {
+            console.log(`Updating images: ${mobile}, ${tablet}, ${desktop}`);
+            d3.select("#f2h-frame-300 object").attr("data", `./assets/${mobile}.svg`);
+            d3.select("#f2h-frame-555 object").attr("data", `./assets/${tablet}.svg`);
+            d3.select("#f2h-frame-1280 object").attr("data", `./assets/${desktop}.svg`);
+            
+            // Force reload of SVG content
+            ['300', '555', '1280'].forEach(size => {
+                const object = document.querySelector(`#f2h-frame-${size} object`);
+                if (object) {
+                    object.addEventListener('load', function() {
+                        const doc = this.contentDocument;
+                        if (doc) {
+                            doc.location.reload(true);
+                        }
+                    }, { once: true });
+                }
+            });
+    
+            figma2htmlResize();
+        }
+    
+        // Scrollama initialization
+        const scrollerImg = scrollama();
+    
+        scrollerImg
+            .setup({
+                step: ".step",
+                offset: 0.9,
+                debug: false
+            })
+            .onStepEnter(function ({ element, index, direction }) {
+                console.log(`Step ${index + 1} entered, direction: ${direction}`);
+                switch(index) {
+                    case 0:
+                        updateImages("300px", "555px", "1280px");
+                        break;
+                    case 1:
+                        updateImages("300px_1", "555px_1", "1280px_1");
+                        break;
+                    case 2:
+                        updateImages("300px_2", "555px_2", "1280px_2");
+                        break;
+                }
+            })
+            .onStepExit(function ({ element, index, direction }) {
+                console.log(`Step ${index} exited, direction: ${direction}`);
+            });
+    
+        // figma2html resizer function
+        function figma2htmlResize() {
+            const infographicsBox = document.getElementById('infographics-box');
+            if (!infographicsBox) return;
+    
+            const frames = infographicsBox.querySelectorAll('.f2h-frame');
+            frames.forEach(frame => {
+                frame.style.display = 'none';
+            });
+    
+            let selectedFrame;
+            if (window.innerWidth >= 1280) {
+                selectedFrame = infographicsBox.querySelector('#f2h-frame-1280');
+            } else if (window.innerWidth >= 555) {
+                selectedFrame = infographicsBox.querySelector('#f2h-frame-555');
+            } else {
+                selectedFrame = infographicsBox.querySelector('#f2h-frame-300');
             }
-        })
-        .onStepExit(function ({ element, index, direction }) {
-            console.log(`Step ${index} exited, direction: ${direction}`);
-        });
-
-    // figma2html resizer function
-    function figma2htmlResize() {
-        const infographicsBox = document.getElementById('infographics-box');
-        if (!infographicsBox) return;
-
-        const frames = infographicsBox.querySelectorAll('.f2h-frame');
-        frames.forEach(frame => {
-            frame.style.display = 'none';
-        });
-
-        let selectedFrame;
-        if (window.innerWidth >= 1280) {
-            selectedFrame = infographicsBox.querySelector('#f2h-frame-1280');
-        } else if (window.innerWidth >= 555) {
-            selectedFrame = infographicsBox.querySelector('#f2h-frame-555');
-        } else {
-            selectedFrame = infographicsBox.querySelector('#f2h-frame-300');
+    
+            if (selectedFrame) {
+                selectedFrame.style.display = 'block';
+            }
         }
-
-        if (selectedFrame) {
-            selectedFrame.style.display = 'block';
-        }
-    }
-
-    // Initial resize and event listener
-    figma2htmlResize();
-    window.addEventListener('resize', figma2htmlResize);
-
-    // Initial image setup
-    updateImages("300px", "555px", "1280px");
-</script>
+    
+        // Initial resize and event listener
+        figma2htmlResize();
+        window.addEventListener('resize', figma2htmlResize);
+    
+        // Initial image setup
+        updateImages("300px", "555px", "1280px");
+    </script>
 </body>
 </html>

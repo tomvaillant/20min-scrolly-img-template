@@ -8,6 +8,7 @@
   @font-face {
     font-family: 'BatonTurbo';
     src: url('./fonts/BatonTurboWeb-Medium.woff') format('woff');
+    font-weight: bold;
     font-style: bold;
   }
 
@@ -17,7 +18,7 @@
   
   .sticky-inner img {
     width: 100%;
-    object-fit: cover;
+    object-fit: contain;
     height: 100vh;
   }
   
@@ -75,7 +76,7 @@
   .hidden { visibility: hidden; }
   
   iframe,
-  img,
+  object,
   video {
     max-width: 100%;
   }
@@ -105,7 +106,7 @@
   
   @media (max-width: 640px) {
     body {
-      font-size: 18px;
+      font-size: 12px;
     }
     h1 {
       font-size: 40px;
@@ -114,15 +115,14 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      height: 100%;
     }
     .sticky-inner img {
-      max-width: none;
-      object-fit: cover;
+      max-width: 100%; /* Changed from none to 100% */
+      object-fit: contain; /* Changed from cover to contain */
       height: 100%;
     }
     .step p {
-      font-size: 18px;
+      font-size: 12px;
     }
   }
   
