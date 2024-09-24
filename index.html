@@ -41,96 +41,87 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/scrollama/3.0.4/scrollama.min.js"></script>
-    <script>
-        // Preload SVGs
-        const imageNames = ['300px', '300px_1', '300px_2', '555px', '555px_1', '555px_2', '1280px', '1280px_1', '1280px_2'];
-        imageNames.forEach(name => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', `./assets/${name}.svg`, true);
-            xhr.send();
-        });
     
-        function updateImages(mobile, tablet, desktop) {
+    <script>
+    const App = {
+        imageNames: ['300px', '300px_1', '300px_2', '555px', '555px_1', '555px_2', '1280px', '1280px_1', '1280px_2'],
+        currentIndex: 0,
+        imageCache: {},
+
+        init() {
+            this.preloadSVGs();
+            this.initScrollama();
+            this.initResizeHandler();
+            this.updateImages("300px", "555px", "1280px");
+        },
+
+        preloadSVGs() {
+            this.imageNames.forEach(name => {
+                const img = new Image();
+                img.src = `./assets/${name}.svg`;
+                this.imageCache[name] = img;
+            });
+        },
+
+        updateImages(mobile, tablet, desktop) {
             console.log(`Updating images: ${mobile}, ${tablet}, ${desktop}`);
-            d3.select("#f2h-frame-300 object").attr("data", `./assets/${mobile}.svg`);
-            d3.select("#f2h-frame-555 object").attr("data", `./assets/${tablet}.svg`);
-            d3.select("#f2h-frame-1280 object").attr("data", `./assets/${desktop}.svg`);
-            
-            // Force reload of SVG content
             ['300', '555', '1280'].forEach(size => {
+                const imageName = size === '300' ? mobile : size === '555' ? tablet : desktop;
                 const object = document.querySelector(`#f2h-frame-${size} object`);
                 if (object) {
-                    object.addEventListener('load', function() {
-                        const doc = this.contentDocument;
-                        if (doc) {
-                            doc.location.reload(true);
-                        }
-                    }, { once: true });
+                    object.data = this.imageCache[imageName].src;
                 }
             });
-    
-            figma2htmlResize();
-        }
-    
-        // Scrollama initialization
-        let currentIndex = 0;
-        const scrollerImg = scrollama();
-        scrollerImg
-            .setup({
-                step: ".step",
-                offset: 0.9,
-                debug: true
-            })
-            .onStepEnter(function ({ element, index, direction }) {
-                if (currentIndex == index) return;
-                currentIndex = index;
-                console.log(`Step ${index + 1} entered, direction: ${direction}`);
-                switch(index) {
-                    case 0:
-                        updateImages("300px", "555px", "1280px");
-                        break;
-                    case 1:
-                        updateImages("300px_1", "555px_1", "1280px_1");
-                        break;
-                    case 2:
-                        updateImages("300px_2", "555px_2", "1280px_2");
-                        break;
-                }
-            })
-            .onStepExit(function ({ element, index, direction }) {
-                console.log(`Step ${index} exited, direction: ${direction}`);
-            });
-    
-        // figma2html resizer function
-        function figma2htmlResize() {
+            this.figma2htmlResize();
+        },
+
+        initScrollama() {
+            scrollama()
+                .setup({
+                    step: ".step",
+                    offset: 0.9,
+                    debug: false
+                })
+                .onStepEnter(({ index, direction }) => {
+                    if (this.currentIndex === index) return;
+                    this.currentIndex = index;
+                    console.log(`Step ${index + 1} entered, direction: ${direction}`);
+                    const imageSets = [
+                        ["300px", "555px", "1280px"],
+                        ["300px_1", "555px_1", "1280px_1"],
+                        ["300px_2", "555px_2", "1280px_2"]
+                    ];
+                    this.updateImages(...imageSets[index]);
+                })
+                .onStepExit(({ index, direction }) => {
+                    console.log(`Step ${index} exited, direction: ${direction}`);
+                });
+        },
+
+        figma2htmlResize() {
             const infographicsBox = document.getElementById('infographics-box');
             if (!infographicsBox) return;
-    
+
             const frames = infographicsBox.querySelectorAll('.f2h-frame');
-            frames.forEach(frame => {
-                frame.style.display = 'none';
-            });
-    
-            let selectedFrame;
-            if (window.innerWidth >= 1280) {
-                selectedFrame = infographicsBox.querySelector('#f2h-frame-1280');
-            } else if (window.innerWidth >= 555) {
-                selectedFrame = infographicsBox.querySelector('#f2h-frame-555');
-            } else {
-                selectedFrame = infographicsBox.querySelector('#f2h-frame-300');
-            }
-    
+            frames.forEach(frame => frame.style.display = 'none');
+
+            const selectedFrame = infographicsBox.querySelector(
+                window.innerWidth >= 1280 ? '#f2h-frame-1280' :
+                window.innerWidth >= 555 ? '#f2h-frame-555' :
+                '#f2h-frame-300'
+            );
+
             if (selectedFrame) {
                 selectedFrame.style.display = 'block';
             }
+        },
+
+        initResizeHandler() {
+            window.addEventListener('resize', () => this.figma2htmlResize());
         }
-    
-        // Initial resize and event listener
-        figma2htmlResize();
-        window.addEventListener('resize', figma2htmlResize);
-    
-        // Initial image setup
-        updateImages("300px", "555px", "1280px");
+    };
+
+    document.addEventListener('DOMContentLoaded', () => App.init());
     </script>
 </body>
 </html>
